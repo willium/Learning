@@ -68,11 +68,11 @@ function refreshCars() {
             return "translate(" + trackData[d.track][0] + ")"
         })
         .transition()
-        .duration(15000)
+        .duration(10000)
         .ease("linear")
         .attrTween("transform", translateAlong(tracks[0]))
         .each("end", function(d, i) {
-\            this.remove();
+            this.remove();
         });
 
     circles.exit().remove();
@@ -102,7 +102,7 @@ function addCarToTrack(id) {
 
     setTimeout(function() {
         addCarToTrack(id)
-    }, 2000);
+    }, 1000);
 }
 
 addCarToTrack(0);
