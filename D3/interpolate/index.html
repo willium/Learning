@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<style>
+
+path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+
+var svg = d3.select("body").append("svg")
+    .attr("width", window.innerWidth)
+    .attr("height", window.innerHeight);
+
+var trackData = [[
+  [480, 200],
+  [580, 400],
+  [680, 100],
+  [780, 300],
+  [180, 300],
+  [280, 100],
+  [380, 400]
+],[
+  [480, 500],
+  [580, 600],
+  [680, 700],
+  [780, 800],
+  [180, 800],
+  [280, 700],
+  [380, 600]
+]];
+
+var tracks = svg.selectAll("g")
+    .data(trackData)
+    .enter()
+        .append("path")
+        .attr('points', function(d, i) {
+            return [d];
+        })
+        .attr('id', function(d, i) {
+            return "track-" + i;
+        })
+        .attr("d", d3.svg.line()
+            .tension(0) // Catmull–Rom
+            .interpolate("linear")
+        );
+
+var cars = [];
+
+function refreshCars() {
+    var circles = svg.selectAll("circle")
+        .data(cars);
+
+    circles.enter()
+        .append("circle")
+        .style("fill", "black")
+        .attr("r", 10)
+        .attr("id", function(d, i) {
+            return "car-" + i;
+        })
+        .attr("transform", function(d, i) {
+            return "translate(" + trackData[d.track][0] + ")"
+        })
+        .transition()
+        .duration(15000)
+        .ease("linear")
+        .attrTween("transform", translateAlong(tracks[0]))
+        .each("end", function(d, i) {
+\            this.remove();
+        });
+
+    circles.exit().remove();
+    // transition();
+}
+
+function transition() {
+
+}
+
+function translateAlong(ph) {
+    return function(d, i, a) {
+        var l = ph[d.track].getTotalLength();
+        return function(t) {
+            var p = ph[d.track].getPointAtLength(t * l);
+            return "translate(" + p.x + "," + p.y + ")";
+        };
+    };
+}
+
+function addCarToTrack(id) {
+    var car = {
+        "track": id
+    }
+    cars.push(car)
+    refreshCars()
+
+    setTimeout(function() {
+        addCarToTrack(id)
+    }, 2000);
+}
+
+addCarToTrack(0);
+addCarToTrack(1);
+
+</script>
